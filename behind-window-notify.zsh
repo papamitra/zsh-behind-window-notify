@@ -9,15 +9,13 @@ add-zsh-hook preexec remenber-cmd
 
 function behind-window-notify(){
   if [[ -n $TMUX ]] then
-    panes=`tmux list-panes -F'#{pane_id}'`
-
-    if test -z ${(M)panes#$TMUX_PANE}; then
-      if [[ ${OSTYPE} == darwin* ]] then
-        # TODO: OSX用にgrowlを呼ぶ処理.
-      else
-	notify-send -t 3000 -u low "コマンド終了: " "$LASTCMD"
+    for pane in `tmux list-panes -F'#{pane_id}'`; do
+      if [[ $pane == $TMUX_PANE ]] then
+        return 0
       fi
-    fi
+    done
+    
+    notify-send -t 3000 -u low "コマンド終了: " "$LASTCMD"
   fi
 }
 
